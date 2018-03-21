@@ -4,7 +4,7 @@ try
   module = angular.module 'ndx'
 catch e
   module = angular.module 'ndx', []
-module.directive 'dragPanel', ($timeout) ->
+module.directive 'dragPanel', ->
   restrict: 'AE'
   require: '?ngModel'
   link: (scope, elem, attrs, ctrl) ->
@@ -23,7 +23,22 @@ module.directive 'dragPanel', ($timeout) ->
       allPanels = $(elem).children(':not(.divider)')
       for p, i in allPanels
         $(p).css
-          flex: (if ctrl then ctrl.$modelValue[i] else 1).toString()
+          flex: (if arr then arr[i] else 1).toString()
+    if attrs.remote
+      remote = 
+        setHorizontal: ->
+          elem.addClass 'horizontal'
+          pageDir = 'pageX'
+          elemDir = 'width'
+          dividers.addClass 'horizontal'
+          setFromArr()
+        setVertical: ->
+          elem.removeClass 'horizontal'
+          pageDir = 'pageY'
+          elemDir = 'height'
+          dividers.removeClass 'horizontal'
+          setFromArr()
+      scope[attrs.remote] = remote
     dividers.bind 'mousedown', (e) ->
       e.preventDefault()
       $target = $(e.target)
@@ -34,14 +49,14 @@ module.directive 'dragPanel', ($timeout) ->
       nextMeasure = next[elemDir]()
       pagePos = e[pageDir]
       allPanels = $(elem).children(':not(.divider)')
-      setOrig = (p) ->
-        $p = $(p)
-        mymeasure = $p[elemDir]()
-        $timeout ->
-          $p.css
-            flex: mymeasure.toString()
+      measures = []
       for p in allPanels
-        setOrig p
+        $p = $(p)
+        measures.push $p[elemDir]()
+      for p, i in allPanels
+        $p = $(p)
+        $p.css
+          flex: measures[i].toString()
       $(document).bind 'mousemove', (e) ->
         offset = pagePos - e[pageDir]
         newPrev = measure - offset
@@ -65,10 +80,8 @@ module.directive 'dragPanel', ($timeout) ->
       $(document).mouseleave (e) ->
         end()
     if ctrl
-      console.log 'unshifting'
       ctrl.$formatters.unshift (val) ->
         setFromArr val
         val
     else
       setFromArr()
-      

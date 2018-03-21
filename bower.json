@@ -1,0 +1,17 @@
+{
+  "name": "ndx-drag-panel",
+  "description": "draggable panels for ndx-framework apps",
+  "main": ["build/index.js", "build/index.css"],
+  "authors": [
+    "ndxbxrme"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ndxbxrme/ndx-drag-panel",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

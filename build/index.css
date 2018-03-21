@@ -1,0 +1,1 @@
+drag-panel{height:100%;width:100%;display:flex;flex-direction:column;}drag-panel .divider{height:1.6rem;min-height:1.6rem;background:#343436;color:#fff;cursor:ns-resize;flex:0 !important;}drag-panel .divider.dragging{background:#242425}drag-panel .divider.horizontal{width:1.6rem;min-width:1.6rem;height:100%;cursor:ew-resize}drag-panel.horizontal{flex-direction:row}

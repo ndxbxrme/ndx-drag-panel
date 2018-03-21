@@ -1,0 +1,22 @@
+mygrey = #343436
+drag-panel
+  height 100%
+  width 100%
+  display flex
+  flex-direction column
+  .divider
+    height 1.6rem
+    min-height 1.6rem
+    background mygrey
+    color white
+    cursor ns-resize
+    flex 0!important
+    &.dragging
+      background mix(black, mygrey, 30)
+    &.horizontal
+      width 1.6rem
+      min-width 1.6rem
+      height 100%
+      cursor ew-resize
+  &.horizontal
+    flex-direction row

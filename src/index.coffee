@@ -8,6 +8,13 @@ module.directive 'dragPanel', ->
   restrict: 'AE'
   require: '?ngModel'
   link: (scope, elem, attrs, ctrl) ->
+    callbacks =
+      start: []
+      move: []
+      end: []
+    callCallbacks = (name, args) ->
+      for cb in callbacks[name]
+        cb? args
     horizontal = elem.hasClass 'horizontal'
     pageDir = 'pageY'
     elemDir = 'height'
@@ -38,8 +45,13 @@ module.directive 'dragPanel', ->
           elemDir = 'height'
           dividers.removeClass 'horizontal'
           setFromArr()
+        on: (name, fn) ->
+          callbacks[name].push fn
+        off: (name, fn) ->
+          callbacks[name].splice(callbacks[name].indexOf(fn), 1)
       scope[attrs.remote] = remote
     dividers.bind 'mousedown', (e) ->
+      callCallbacks 'start'
       e.preventDefault()
       $target = $(e.target)
       $target.addClass 'dragging'
@@ -66,6 +78,7 @@ module.directive 'dragPanel', ->
             flex: newPrev.toString()
            next.css
             flex: newNext.toString()
+          callCallbacks 'move'
       end = ->
         $(document).unbind 'mousemove'
         $(document).unbind 'mouseup'
@@ -75,6 +88,7 @@ module.directive 'dragPanel', ->
           for p in allPanels
             sizes.push $(p)[elemDir]()
           ctrl.$setViewValue sizes
+        callCallbacks 'end'
       $(document).bind 'mouseup', (e) ->
         end()
       $(document).mouseleave (e) ->

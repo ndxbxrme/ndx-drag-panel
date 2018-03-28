@@ -16,7 +16,22 @@
       restrict: 'AE',
       require: '?ngModel',
       link: function(scope, elem, attrs, ctrl) {
-        var dividers, elemDir, horizontal, measure, pageDir, pagePos, prev, remote, setFromArr;
+        var callCallbacks, callbacks, dividers, elemDir, horizontal, measure, pageDir, pagePos, prev, remote, setFromArr;
+        callbacks = {
+          start: [],
+          move: [],
+          end: []
+        };
+        callCallbacks = function(name, args) {
+          var cb, j, len, ref, results;
+          ref = callbacks[name];
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            cb = ref[j];
+            results.push(typeof cb === "function" ? cb(args) : void 0);
+          }
+          return results;
+        };
         horizontal = elem.hasClass('horizontal');
         pageDir = 'pageY';
         elemDir = 'height';
@@ -56,12 +71,19 @@
               elemDir = 'height';
               dividers.removeClass('horizontal');
               return setFromArr();
+            },
+            on: function(name, fn) {
+              return callbacks[name].push(fn);
+            },
+            off: function(name, fn) {
+              return callbacks[name].splice(callbacks[name].indexOf(fn), 1);
             }
           };
           scope[attrs.remote] = remote;
         }
         dividers.bind('mousedown', function(e) {
           var $p, $target, allPanels, end, i, j, k, len, len1, measures, next, nextMeasure, p;
+          callCallbacks('start');
           e.preventDefault();
           $target = $(e.target);
           $target.addClass('dragging');
@@ -93,9 +115,10 @@
               prev.css({
                 flex: newPrev.toString()
               });
-              return next.css({
+              next.css({
                 flex: newNext.toString()
               });
+              return callCallbacks('move');
             }
           });
           end = function() {
@@ -109,8 +132,9 @@
                 p = allPanels[l];
                 sizes.push($(p)[elemDir]());
               }
-              return ctrl.$setViewValue(sizes);
+              ctrl.$setViewValue(sizes);
             }
+            return callCallbacks('end');
           };
           $(document).bind('mouseup', function(e) {
             return end();
